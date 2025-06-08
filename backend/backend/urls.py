@@ -83,6 +83,8 @@ from Where2go.views.oauth_views import (
     social_auth_callback,
 )
 
+from Where2go.views.admin_views import admin_verify_2fa
+
 schema_view = get_schema_view(
     openapi.Info(
         title="Where2go-api",
@@ -99,7 +101,7 @@ schema_view = get_schema_view(
 # LoginView,  UserCreate
 urlpatterns = [
     path("", include('django_prometheus.urls')),
-
+    path('admin/verify-2fa/', admin_verify_2fa, name='admin_verify_2fa'),
     path("admin/", admin.site.urls),
 
     path("accounts/", include('allauth.urls')),  # OAuth URLs

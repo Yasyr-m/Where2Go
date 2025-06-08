@@ -71,6 +71,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "Where2go.middleware.Admin2FAMiddleware",
 ]
 
 ROOT_URLCONF = "backend.urls"

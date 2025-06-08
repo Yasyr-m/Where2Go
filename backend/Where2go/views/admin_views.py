@@ -5,9 +5,44 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render, redirect
+from django.views.decorators.http import require_http_methods
+from django.core.mail import send_mail
+import random
 
 from ..models import CustomUser, Group
 from ..serializers import GroupSerializer, UserSerializer
+
+
+@staff_member_required
+@require_http_methods(["GET", "POST"])
+def admin_verify_2fa(request):
+    if request.method == "POST":
+        code = request.POST.get('code')
+        stored_code = request.session.get('admin_2fa_code')
+        
+        if code == stored_code:
+            request.session['admin_2fa_verified'] = True
+            return redirect('admin:index')
+        else:
+            messages.error(request, 'Неверный код подтверждения')
+    
+    # Генерация нового кода
+    verification_code = str(random.randint(100000, 999999))
+    request.session['admin_2fa_code'] = verification_code
+    
+    # Отправка кода на почту
+    send_mail(
+        'Код подтверждения для входа в админ-панель',
+        f'Ваш код подтверждения: {verification_code}',
+        'where2go-verification@yandex.ru',
+        [request.user.email],
+        fail_silently=False,
+    )
+    
+    return render(request, 'admin/verify_2fa.html')
 
 
 class UserListView(APIView):

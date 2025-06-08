@@ -1,0 +1,29 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <form method="post">
+        {% csrf_token %}
+        <fieldset class="module aligned">
+            <div class="form-row">
+                <label for="code">{% trans "Код подтверждения" %}:</label>
+                <input type="text" name="code" id="code" required>
+                <div class="help">{% trans "Введите код, отправленный на вашу почту" %}</div>
+            </div>
+        </fieldset>
+        <div class="submit-row">
+            <input type="submit" value="{% trans 'Подтвердить' %}" class="default">
+            <button type="button" onclick="document.getElementById('logout-form').submit();" class="button cancel-link">{% trans 'Выйти и вернуться к логину' %}</button>
+        </div>
+    </form>
+    <form id="logout-form" action="/admin/logout/" method="post" style="display: none;">
+        {% csrf_token %}
+    </form>
+</div>
+{% endblock %} 
