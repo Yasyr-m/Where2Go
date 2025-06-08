@@ -122,13 +122,9 @@ DATABASES = {
 
 # CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://localhost:8081",
-    "http://localhost:3000",
-    "https://localhost:8000",
-    "https://127.0.0.1:8000",
-    "https://0.0.0.0:8000",
-    "https://172.19.0.11:8000"
+    "https://localhost:8080",
+    "https://localhost:8081",
+    "https://localhost:3000",
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -321,3 +317,13 @@ SOCIALACCOUNT_STORE_TOKENS = True
 
 # Настройки для callback URL
 CALLBACK_URL = os.getenv('CALLBACK_URL', 'https://localhost:8000/accounts/google/login/callback/')
+
+# Защита  уязвимости X-Frame-Options
+X_FRAME_OPTIONS = 'DENY'
+
+# Защита уязвимости Strict-Transport-Security
+SECURE_HSTS_SECONDS = 31536000  # 1 год
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+SECURE_SSL_REDIRECT = True
