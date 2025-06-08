@@ -26,8 +26,7 @@ class CustomUser(AbstractUser):
         },
     )
     force_password_reset = models.BooleanField(
-        default=False,
-        verbose_name="Требуется сброс пароля"
+        default=False, verbose_name="Требуется сброс пароля"
     )
 
     def __str__(self):
@@ -174,12 +173,16 @@ class Poll(models.Model):
 
 
 class TemporaryAccessLink(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='temporary_links')
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="temporary_links"
+    )
     token = models.CharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     is_active = models.BooleanField(default=True)
-    content_type = models.CharField(max_length=50)  # Тип контента (например, 'profile', 'photos' и т.д.)
+    content_type = models.CharField(
+        max_length=50
+    )  # Тип контента (например, 'profile', 'photos' и т.д.)
     content_id = models.IntegerField()  # ID контента, к которому предоставляется доступ
 
     def __str__(self):
@@ -191,7 +194,9 @@ class TemporaryAccessLink(models.Model):
 
 
 class UserSession(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sessions')
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="sessions"
+    )
     token = models.CharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_activity = models.DateTimeField(auto_now=True)

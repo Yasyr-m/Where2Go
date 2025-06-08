@@ -3,7 +3,6 @@ import {Navbar, Nav, Container, Button, Modal, Form, Alert} from "react-bootstra
 import icon from "../assets/icon.png";
 import API from "../api";
 import {useNavigate} from "react-router-dom";
-//TODO: деактивация сессий
 
 const NavigationBar = ({user}) => {
     const [showSettings, setShowSettings] = React.useState(false);
@@ -78,12 +77,15 @@ const NavigationBar = ({user}) => {
 
     const handleDeactivateSessions = async () => {
         try {
-            //TODO: деактивация всех сессий
-            //await API.post("");
-            console.log("Все сессии завершены.");
+            const response = await API.delete("/sessions/");
+            if (response.status === 204) {
+                showSuccess("Все сессии завершены.")
+            }
+            else {
+                showError(`Ошибка при завершении сессий: ${response.data.error}`);
+            }
         } catch (err) {
-            console.log("Ошибка при деактивации сессий");
-            console.error(err);
+            showError("Ошибка при деактивации сессий");
         }
     };
 
@@ -171,9 +173,9 @@ const NavigationBar = ({user}) => {
 
                         <hr/>
 
-                        <p className="mt-4">Хотите выйти из всех устройств?</p>
+                        <p className="mt-4">Хотите завершить все сессии (кроме текущей)?</p>
                         <Button variant="danger" onClick={handleDeactivateSessions}>
-                            Завершить все сеансы
+                            Завершить сеансы
                         </Button>
                     </Form>
                 </Modal.Body>

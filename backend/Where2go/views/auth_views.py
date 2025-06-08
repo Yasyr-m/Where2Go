@@ -1,3 +1,4 @@
+import logging
 import random
 
 from django.contrib.auth import authenticate
@@ -13,9 +14,8 @@ from rest_framework.views import APIView
 
 from ..management.captcha import verify_captcha
 from ..models import CustomUser
-import logging
 
-logger = logging.getLogger('django.security')
+logger = logging.getLogger("django.security")
 
 
 class LoginView(APIView):

@@ -16,21 +16,18 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import re_path
+from django.urls import include, path, re_path
 from django.views.generic import TemplateView
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-from django.urls import path, include
-
-
 from Where2go.views.admin_views import (
+    AdminUserManagementView,
     GroupDeleteView,
     GroupEditView,
     GroupListView,
     UserBanView,
     UserSessionDeleteView,
-    AdminUserManagementView,
 )
 from Where2go.views.auth_views import (
     ActivateUserView,
@@ -51,8 +48,13 @@ from Where2go.views.group_views import (
     RemoveGroupMemberView,
 )
 from Where2go.views.map_views import NearbyPlacesView
+from Where2go.views.oauth_views import (  # GoogleLoginView,; FacebookLoginView,
+    GoogleLoginView,
+    VKLoginView,
+    social_auth_callback,
+)
+from Where2go.views.poll_views import ClosePollView  # , DeletePollView
 from Where2go.views.poll_views import (
-    ClosePollView,  # , DeletePollView
     CreatePollView,
     PollDetailView,
     PollListAllView,
@@ -62,7 +64,9 @@ from Where2go.views.poll_views import (
     VotePollView,
 )
 from Where2go.views.user_views import (
+    AccessLinkView,
     GetMeView,
+    TemporaryAccessLinkView,
     UpdateUserView,
     UserCreate,
     UserDeleteView,
@@ -70,17 +74,7 @@ from Where2go.views.user_views import (
     UserFriendsView,
     UserListView,
     UserSearchView,
-    TemporaryAccessLinkView,
-    AccessLinkView,
     UserSessionView,
-)
-
-from Where2go.views.oauth_views import (
-    #GoogleLoginView,
-    #FacebookLoginView,
-    VKLoginView,
-    GoogleLoginView,
-    social_auth_callback,
 )
 
 from Where2go.views.admin_views import admin_verify_2fa
@@ -102,13 +96,15 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("", include('django_prometheus.urls')),
     path('admin/verify-2fa/', admin_verify_2fa, name='admin_verify_2fa'),
-    path("admin/", admin.site.urls),
 
-    path("accounts/", include('allauth.urls')),  # OAuth URLs
+    path("", include("django_prometheus.urls")),
+    path("admin/", admin.site.urls),
+    path("accounts/", include("allauth.urls")),  # OAuth URLs
     path("api/auth/vk/", VKLoginView.as_view(), name="vk_login"),
     path("api/auth/google/", GoogleLoginView.as_view(), name="google_login"),
-    path("api/auth/social/callback/", social_auth_callback, name="social_auth_callback"),
-    
+    path(
+        "api/auth/social/callback/", social_auth_callback, name="social_auth_callback"
+    ),
     path("api/auth/register/", UserCreate.as_view(), name="register"),
     path("api/auth/login-2fa", LoginView2FA.as_view(), name="login-2fa"),
     path(
@@ -177,9 +173,11 @@ urlpatterns = [
         name="schema-swagger-ui",
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
+
     # Обслуживание Vue.js приложения
     re_path(r"^$", TemplateView.as_view(template_name="index.html")),
     re_path(r"^(?!api/).*$", TemplateView.as_view(template_name="index.html")),
+
     path("api/admin/users/", UserListView.as_view(), name="admin-user-list"),
     path(
         "api/admin/users/<int:user_id>/",
@@ -209,14 +207,24 @@ urlpatterns = [
     ),
     # path('api/admin/reset-password/<int:user_id>/', ResetPasswordView.as_view(), name='admin-reset-password'),
     # Временные ссылки доступа
-    path('api/access-links/', TemporaryAccessLinkView.as_view(), name='access-links'),
-    path('api/access-links/<str:token>/', TemporaryAccessLinkView.as_view(), name='access-link-detail'),
-    path('api/access/<str:token>/', AccessLinkView.as_view(), name='access-link'),
-    
+    path("api/access-links/", TemporaryAccessLinkView.as_view(), name="access-links"),
+    path(
+        "api/access-links/<str:token>/",
+        TemporaryAccessLinkView.as_view(),
+        name="access-link-detail",
+    ),
+    path("api/access/<str:token>/", AccessLinkView.as_view(), name="access-link"),
     # Управление сессиями
-    path('api/sessions/', UserSessionView.as_view(), name='user-sessions'),
-    path('api/sessions/<int:session_id>/', UserSessionView.as_view(), name='user-session-detail'),
-    
+    path("api/sessions/", UserSessionView.as_view(), name="user-sessions"),
+    path(
+        "api/sessions/<int:session_id>/",
+        UserSessionView.as_view(),
+        name="user-session-detail",
+    ),
     # Административные функции
-    path('api/admin/users/<int:user_id>/manage/', AdminUserManagementView.as_view(), name='admin-user-management'),
+    path(
+        "api/admin/users/<int:user_id>/manage/",
+        AdminUserManagementView.as_view(),
+        name="admin-user-management",
+    ),
 ]

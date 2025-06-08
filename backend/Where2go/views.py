@@ -17,7 +17,7 @@ from .serializers import GroupSerializer, UserSerializer
 
 # Create your views here.
 
-logger = logging.getLogger('django.security')
+logger = logging.getLogger("django.security")
 
 
 class LoginView(APIView):

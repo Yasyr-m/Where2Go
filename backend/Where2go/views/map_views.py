@@ -2,7 +2,6 @@ from django.http import JsonResponse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
-
 from Where2go.management.places import get_places_with_meta
 
 

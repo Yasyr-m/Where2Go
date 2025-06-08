@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {Spinner, Alert, Container, Form, Button} from 'react-bootstrap';
+import {Spinner, Alert, Container, Form, Button, Modal, InputGroup} from 'react-bootstrap';
 import API from "../../api";
 import NavigationBar from "../../components/NavigationBar";
 import RecommendedPlacesList from "./components/RecommendedPlacesList";
@@ -14,6 +14,9 @@ const PollResultsPage = () => {
     const mapInstanceRef = useRef(null);
     const markerRef = useRef(null);
     const circleRef = useRef(null);
+    const [shareLink, setShareLink] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    const [shareError, setShareError] = useState(null);
     const [user, setUser] = useState(null);
     const [results, setResults] = useState(null);
     const [recommendedPlaces, setRecommendedPlaces] = useState([]);
@@ -99,6 +102,23 @@ const PollResultsPage = () => {
         );
     }
 
+    const handleShare = async () => {
+        try {
+            setShareError(null);
+            const response = await API.post("/access-links/", {
+                content_type: "poll_results",
+                content_id: pollId,
+                duration_hours: 24,
+            });
+
+            const link = `${window.location.origin}/access/${response.data.token}`;
+            setShareLink(link);
+            setShowModal(true);
+        } catch (err) {
+            setShareError("Не удалось создать ссылку. Попробуйте позже.");
+        }
+    };
+
     const handleRefresh = async (radius, minRating) => {
         try {
             setRefreshing(true);
@@ -140,6 +160,25 @@ const PollResultsPage = () => {
                 <p>Всего голосов: {results.total_votes}</p>
                 <p>Категории с наибольшим количеством голосов: {results.most_popular_categories.join(', ')}</p>
                 <p>Точка поиска: {results.average_point.lat}, {results.average_point.lon} </p>
+                <Button className="mt-4 me-2" variant="outline-primary" onClick={handleShare}>
+                    Поделиться результатами
+                </Button>
+
+                {shareError && <Alert variant="danger" className="mt-2">{shareError}</Alert>}
+
+                <Modal show={showModal} onHide={() => setShowModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Ссылка для доступа</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Label>Скопируйте и отправьте ссылку:</Form.Label>
+                        <InputGroup className="mb-3">
+                            <Form.Control type="text" readOnly value={shareLink}/>
+                            <Button variant="secondary" onClick={() => navigator.clipboard.writeText(shareLink)}>Скопировать</Button>
+                        </InputGroup>
+                    </Modal.Body>
+                </Modal>
+
                 <div ref={mapRef} style={{width: "100%", height: "400px", marginTop: "20px"}}/>
                 <Form className="mb-3">
                     <Form.Group controlId="radiusInput" className="mt-4">

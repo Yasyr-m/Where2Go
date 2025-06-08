@@ -20,10 +20,6 @@ services:
       - django_logs:/app/logs
     depends_on:
       - db
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py createsuperuser --noinput &&
-             python manage.py runserver 0.0.0.0:8000"
 
   frontend:
     container_name: frontend
@@ -38,14 +34,13 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: where2go
+      POSTGRES_DB: where2go_db
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: 123
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   prometheus:
     image: prom/prometheus

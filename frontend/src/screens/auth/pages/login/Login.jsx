@@ -96,6 +96,16 @@ function Login() {
                         Нет аккаунта? <Link to="/register" className="text-decoration-none">Зарегистрируйтесь</Link>
                     </p>
                 </div>
+
+                <div className="mt-3">
+                    <button
+                        className="btn btn-outline-danger w-100 mb-2"
+                        onClick={() => window.location.href = "https://localhost:8000/api/auth/google/"}
+                    >
+                        Войти через Google
+                    </button>
+                </div>
+
             </div>
         </div>
     );
